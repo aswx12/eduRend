@@ -75,11 +75,13 @@ class OurTestScene : public Scene
 	Camera* camera;
 
 	QuadModel* quad;
+	Cube* cube;
 	OBJModel* sponza;
 
 	// Model-to-world transformation matrices
 	mat4f Msponza;
 	mat4f Mquad;
+	mat4f Mcube;
 
 	// World-to-view matrix
 	mat4f Mview;

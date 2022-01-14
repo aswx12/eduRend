@@ -47,6 +47,7 @@ void OurTestScene::Init()
 
 	// Create objects
 	quad = new QuadModel(dxdevice, dxdevice_context);
+	cube = new Cube(dxdevice, dxdevice_context);
 	sponza = new OBJModel("assets/crytek-sponza/sponza.obj", dxdevice, dxdevice_context);
 }
 
@@ -79,10 +80,14 @@ void OurTestScene::Update(
 		mat4f::rotation(-angle, 0.0f, 1.0f, 0.0f) *	// Rotate continuously around the y-axis
 		mat4f::scaling(1.5, 1.5, 1.5);				// Scale uniformly to 150%
 
+	Mcube = mat4f::translation(0, -1, -4) *			// No translation
+		/*mat4f::rotation(-angle, 0.0f, 0.0f, 0.0f) **/	// Rotate continuously around the y-axis
+		mat4f::scaling(1.5, 1.5, 1.5);				// Scale uniformly to 150%
+
 	// Sponza model-to-world transformation
 	Msponza = mat4f::translation(0, -5, 0) *		 // Move down 5 units
 		mat4f::rotation(fPI / 2, 0.0f, 1.0f, 0.0f) * // Rotate pi/2 radians (90 degrees) around y
-		mat4f::scaling(0.05f);						 // The scene is quite large so scale it down to 5%
+		mat4f::scaling(1.0f);						 // The scene is quite large so scale it down to 5%
 
 	// Increment the rotation angle.
 	angle += angle_vel * dt;
@@ -110,17 +115,19 @@ void OurTestScene::Render()
 	Mproj = camera->get_ProjectionMatrix();
 
 	// Load matrices + the Quad's transformation to the device and render it
-	UpdateTransformationBuffer(Mquad, Mview, Mproj);
-	quad->Render();
-
+	//UpdateTransformationBuffer(Mquad, Mview, Mproj);
+	//quad->Render();
+	UpdateTransformationBuffer(Mcube, Mview, Mproj);
+	cube->Render();
 	// Load matrices + Sponza's transformation to the device and render it
-	UpdateTransformationBuffer(Msponza, Mview, Mproj);
-	sponza->Render();
+	/*UpdateTransformationBuffer(Msponza, Mview, Mproj);
+	sponza->Render();*/
 }
 
 void OurTestScene::Release()
 {
 	SAFE_DELETE(quad);
+	SAFE_DELETE(cube);
 	SAFE_DELETE(sponza);
 	SAFE_DELETE(camera);
 
