@@ -34,11 +34,12 @@ protected:
 public:
 
 	Model(
-		ID3D11Device* dxdevice, 
-		ID3D11DeviceContext* dxdevice_context) 
-		:	dxdevice(dxdevice),
-			dxdevice_context(dxdevice_context)
-	{ }
+		ID3D11Device* dxdevice,
+		ID3D11DeviceContext* dxdevice_context)
+		: dxdevice(dxdevice),
+		dxdevice_context(dxdevice_context)
+	{
+	}
 
 	//
 	// Abstract render method: must be implemented by derived classes
@@ -49,7 +50,7 @@ public:
 	// Destructor
 	//
 	virtual ~Model()
-	{ 
+	{
 		SAFE_RELEASE(vertex_buffer);
 		SAFE_RELEASE(index_buffer);
 	}
@@ -67,16 +68,35 @@ public:
 
 	virtual void Render() const;
 
-	~QuadModel() { }
+	~QuadModel() {}
 };
 
 class Cube : public Model
 {
 	unsigned nbr_indices = 0;
 
+	struct IndexRange
+	{
+		unsigned int start;
+		unsigned int size;
+		unsigned ofs;
+		int mtl_index;
+	};
+
+	std::vector<IndexRange> index_ranges;
+	std::vector<Material> materials;
+
+	void append_materials(const std::vector<Material>& mtl_vec)
+	{
+		materials.insert(materials.end(), mtl_vec.begin(), mtl_vec.end());
+	}
+
 public:
 
+	Material mat;
+
 	Cube(
+		const std::string& objfile,
 		ID3D11Device* dx3ddevice,
 		ID3D11DeviceContext* dx3ddevice_context);
 
@@ -105,6 +125,8 @@ class OBJModel : public Model
 	}
 
 public:
+
+	vec3f Ka = { 0,0.5,0 }, Kd = { 0,0.5,0 }, Ks = { 1,1,1 };
 
 	OBJModel(
 		const std::string& objfile,

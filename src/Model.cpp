@@ -9,14 +9,37 @@
 #pragma region Cube
 
 Cube::Cube(
+	const std::string& objfile,
 	ID3D11Device* dxdevice,
 	ID3D11DeviceContext* dxdevice_context)
 	: Model(dxdevice, dxdevice_context)
 {
+	mat = Material();
 	// Vertex and index arrays
 	// Once their data is loaded to GPU buffers, they are not needed anymore
 	std::vector<Vertex> vertices;
 	std::vector<unsigned> indices;
+	
+	OBJLoader* cubeMat = new OBJLoader();
+
+	cubeMat->Load(objfile);
+	// Load and organize indices in ranges per drawcall (material)
+
+	unsigned int i_ofs = 0;
+
+	for (auto& dc : cubeMat->drawcalls)
+	{
+		// Append the drawcall indices
+		for (auto& tri : dc.tris)
+			indices.insert(indices.end(), tri.vi, tri.vi + 3);
+
+		// Create a range
+		unsigned int i_size = (unsigned int)dc.tris.size() * 3;
+		int mtl_index = dc.mtl_index > -1 ? dc.mtl_index : -1;
+		index_ranges.push_back({ i_ofs, i_size, 0, mtl_index });
+
+		i_ofs = (unsigned int)indices.size();
+	}
 
 	// Populate the vertex array with 4 vertices
 	Vertex v0, v1, v2, v3;
@@ -28,17 +51,17 @@ Cube::Cube(
 
 #pragma region Back Face Values
 
-	v0.Pos = { -0.5, -0.5f, 0.0f }; // left down corner
-	v0.Normal = { 0, 0, 1 };
+	v0.Pos = { -0.5, -0.5f, -0.5f }; // left down corner
+	v0.Normal = { 0, 0, -1 };
 	v0.TexCoord = { 0, 0 };
-	v1.Pos = { 0.5, -0.5f, 0.0f }; // right down corner
-	v1.Normal = { 0, 0, 1 };
+	v1.Pos = { 0.5, -0.5f, -0.5f }; // right down corner
+	v1.Normal = { 0, 0, -1 };
 	v1.TexCoord = { 0, 1 };
-	v2.Pos = { 0.5, 0.5f, 0.0f }; // right up corner
-	v2.Normal = { 0, 0, 1 };
+	v2.Pos = { 0.5, 0.5f, -0.5f }; // right up corner
+	v2.Normal = { 0, 0, -1 };
 	v2.TexCoord = { 1, 1 };
-	v3.Pos = { -0.5, 0.5f, 0.0f }; // left up corner
-	v3.Normal = { 0, 0, 1 };
+	v3.Pos = { -0.5, 0.5f, -0.5f }; // left up corner
+	v3.Normal = { 0, 0, -1 };
 	v3.TexCoord = { 1, 0 };
 	vertices.push_back(v0);
 	vertices.push_back(v1);
@@ -48,16 +71,16 @@ Cube::Cube(
 
 #pragma region Front Face Values
 
-	v4.Pos = { -0.5, -0.5f, 1.0f }; // left down corner
+	v4.Pos = { -0.5, -0.5f, 0.5f }; // left down corner
 	v4.Normal = { 0, 0, 1 };
 	v4.TexCoord = { 0, 0 };
-	v5.Pos = { 0.5, -0.5f, 1.0f }; // right down corner
+	v5.Pos = { 0.5, -0.5f, 0.5f }; // right down corner
 	v5.Normal = { 0, 0, 1 };
 	v5.TexCoord = { 0, 1 };
-	v6.Pos = { 0.5, 0.5f, 1.0f }; // right up corner
+	v6.Pos = { 0.5, 0.5f, 0.5f }; // right up corner
 	v6.Normal = { 0, 0, 1 };
 	v6.TexCoord = { 1, 1 };
-	v7.Pos = { -0.5, 0.5f, 1.0f }; // left up corner
+	v7.Pos = { -0.5, 0.5f, 0.5f }; // left up corner
 	v7.Normal = { 0, 0, 1 };
 	v7.TexCoord = { 1, 0 };
 	vertices.push_back(v4);
@@ -89,16 +112,16 @@ Cube::Cube(
 #pragma region Left Face Values
 
 	v12.Pos = v0.Pos;
-	v12.Normal = { 1, 0, 0 };
+	v12.Normal = { -1, 0, 0 };
 	v12.TexCoord = { 0, 0 };
 	v13.Pos = v4.Pos;
-	v13.Normal = { 1, 0, 0 };
+	v13.Normal = { -1, 0, 0 };
 	v13.TexCoord = { 0, 1 };
 	v14.Pos = v7.Pos;
-	v14.Normal = { 1, 0, 0 };
+	v14.Normal = { -1, 0, 0 };
 	v14.TexCoord = { 1, 11 };
 	v15.Pos = v3.Pos;
-	v15.Normal = { 1, 0, 0 };
+	v15.Normal = { -1, 0, 0 };
 	v15.TexCoord = { 1, 0 };
 	vertices.push_back(v12);
 	vertices.push_back(v13);
@@ -129,16 +152,16 @@ Cube::Cube(
 #pragma region Bottom Face Values
 
 	v20.Pos = v0.Pos;
-	v20.Normal = { 0, 1, 0 };
+	v20.Normal = { 0, -1, 0 };
 	v20.TexCoord = { 0, 0 };
 	v21.Pos = v1.Pos;
-	v21.Normal = { 0, 1, 0 };
+	v21.Normal = { 0, -1, 0 };
 	v21.TexCoord = { 0, 1 };
 	v22.Pos = v5.Pos;
-	v22.Normal = { 0, 1, 0 };
+	v22.Normal = { 0, -1, 0 };
 	v22.TexCoord = { 1, 1 };
 	v23.Pos = v4.Pos;
-	v23.Normal = { 0, 1, 0 };
+	v23.Normal = { 0, -1, 0 };
 	v23.TexCoord = { 1, 0 };
 	vertices.push_back(v20);
 	vertices.push_back(v21);
@@ -201,7 +224,7 @@ Cube::Cube(
 
 #pragma endregion
 
-#pragma region Bottom Face Triangles
+#pragma region Bottom Face Triangles 0 1 2 1 2 3
 
 	indices.push_back(20);
 	indices.push_back(21);
@@ -212,6 +235,8 @@ Cube::Cube(
 	indices.push_back(23);
 
 #pragma endregion
+
+
 
 	// Vertex array descriptor
 	D3D11_BUFFER_DESC vbufferDesc = { 0 };
@@ -242,6 +267,35 @@ Cube::Cube(
 	SETNAME(index_buffer, "IndexBuffer");
 
 	nbr_indices = (unsigned int)indices.size();
+
+	// Copy materials from mesh
+	append_materials(cubeMat->materials);
+
+	// Go through materials and load textures (if any) to device
+	std::cout << "Loading textures..." << std::endl;
+	for (auto& mtl : materials)
+	{
+		HRESULT hr;
+
+		// Load Diffuse texture
+		//
+		if (mtl.Kd_texture_filename.size())
+		{
+
+			hr = LoadTextureFromFile(
+				dxdevice,
+				mtl.Kd_texture_filename.c_str(),
+				&mtl.diffuse_texture);
+			std::cout << "\t" << mtl.Kd_texture_filename
+				<< (SUCCEEDED(hr) ? " - OK" : "- FAILED") << std::endl;
+		}
+
+		// + other texture types here - see Material class
+		// ...
+	}
+	std::cout << "Done." << std::endl;
+
+	SAFE_DELETE(cubeMat);
 }
 
 

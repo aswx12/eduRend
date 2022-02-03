@@ -18,6 +18,10 @@
 
 #define ASSERT(x) if(FAILED(x)) { throw std::runtime_error("ASSERT failed\n"); }
 
+#define MIN(x, y) (x < y ? x : y)
+#define MAX(x, y) (x > y ? x : y)
+#define CLAMP(x, min, max) (MIN(MAX(x, min), max))
+
 #ifdef _DEBUG
 #define SETNAME(object, name) object->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(name) - 1, name)
 #else

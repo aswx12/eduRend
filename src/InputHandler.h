@@ -9,7 +9,8 @@
 #pragma once
 #include "stdafx.h"
 
-enum Keys {
+enum Keys
+{
 	Left = DIK_LEFT,
 	Right = DIK_RIGHT,
 	Up = DIK_UP,
@@ -17,10 +18,19 @@ enum Keys {
 	W = DIK_W,
 	A = DIK_A,
 	S = DIK_S,
-	D = DIK_D
+	D = DIK_D,
+	Q = DIK_Q,
+	E = DIK_E,
+	Ctrl = DIK_LCONTROL,
+	Shift = DIK_LSHIFT,
+	Space = DIK_SPACE,
+
+	//RightClick = mouseeventri
+
 };
 
-class InputHandler {
+class InputHandler
+{
 private:
 	IDirectInput8* directInput;
 	IDirectInputDevice8* keyboard;
