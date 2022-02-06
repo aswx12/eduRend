@@ -31,6 +31,10 @@ protected:
 	ID3D11Buffer* vertex_buffer = nullptr;
 	ID3D11Buffer* index_buffer = nullptr;
 
+	//pointers to material buffer and texture sampler
+	ID3D11Buffer* MaterialBuffer = nullptr;
+	ID3D11SamplerState* SamplerState = nullptr;
+
 public:
 
 	Model(
@@ -39,6 +43,22 @@ public:
 		: dxdevice(dxdevice),
 		dxdevice_context(dxdevice_context)
 	{
+		HRESULT hr;
+
+		D3D11_SAMPLER_DESC sd =
+		{
+			D3D11_FILTER_ANISOTROPIC, //Filter
+			D3D11_TEXTURE_ADDRESS_WRAP,//AddressU
+			D3D11_TEXTURE_ADDRESS_WRAP,//AddressV
+			D3D11_TEXTURE_ADDRESS_WRAP,//AddressW
+			0.0f,//MipLODBias
+			4,//MaxAnisotropy
+			D3D11_COMPARISON_NEVER,//Comparisonfunc
+			{ 1.0f, 1.0f, 1.0f, 1.0f },//BorderColor
+			-FLT_MAX,//MinLOD
+			FLT_MAX//MaxLOD
+		};
+		ASSERT(hr = dxdevice->CreateSamplerState(&sd, &SamplerState));
 	}
 
 	//
@@ -93,7 +113,7 @@ class Cube : public Model
 
 public:
 
-	Material mat;
+	vec3f Ka = { 0,0.5,0 }, Kd = { 0,0.5,0 }, Ks = { 1,1,1 };
 
 	Cube(
 		const std::string& objfile,
@@ -102,7 +122,7 @@ public:
 
 	virtual void Render() const;
 
-	~Cube() {}
+	~Cube();
 };
 
 class OBJModel : public Model

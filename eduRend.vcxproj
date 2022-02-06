@@ -142,9 +142,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="lib\stb_image.h" />
-    <ClInclude Include="LightPoint.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Drawcall.h" />
+    <ClInclude Include="src\LightPoint.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\InputHandler.h" />
     <ClInclude Include="src\Keycodes.h" />

@@ -14,7 +14,6 @@ Cube::Cube(
 	ID3D11DeviceContext* dxdevice_context)
 	: Model(dxdevice, dxdevice_context)
 {
-	mat = Material();
 	// Vertex and index arrays
 	// Once their data is loaded to GPU buffers, they are not needed anymore
 	std::vector<Vertex> vertices;
@@ -119,7 +118,7 @@ Cube::Cube(
 	v13.TexCoord = { 0, 1 };
 	v14.Pos = v7.Pos;
 	v14.Normal = { -1, 0, 0 };
-	v14.TexCoord = { 1, 11 };
+	v14.TexCoord = { 1, 1 };
 	v15.Pos = v3.Pos;
 	v15.Normal = { -1, 0, 0 };
 	v15.TexCoord = { 1, 0 };
@@ -168,7 +167,6 @@ Cube::Cube(
 	vertices.push_back(v22);
 	vertices.push_back(v23);
 #pragma endregion
-
 
 #pragma region Back Face Triangles
 	// Triangle #1
@@ -224,7 +222,7 @@ Cube::Cube(
 
 #pragma endregion
 
-#pragma region Bottom Face Triangles 0 1 2 1 2 3
+#pragma region Bottom Face Triangles 
 
 	indices.push_back(20);
 	indices.push_back(21);
@@ -235,8 +233,6 @@ Cube::Cube(
 	indices.push_back(23);
 
 #pragma endregion
-
-
 
 	// Vertex array descriptor
 	D3D11_BUFFER_DESC vbufferDesc = { 0 };
@@ -309,12 +305,37 @@ void Cube::Render() const
 	// Bind our index buffer
 	dxdevice_context->IASetIndexBuffer(index_buffer, DXGI_FORMAT_R32_UINT, 0);
 
-	// Make the drawcall
-	dxdevice_context->DrawIndexed(nbr_indices, 0, 0);
+	for (auto& irange : index_ranges)
+	{
+		// Fetch material
+		const Material& mtl = materials[irange.mtl_index];
+
+		// Bind diffuse texture to slot t0 of the PS
+		dxdevice_context->PSSetShaderResources(0, 1, &mtl.diffuse_texture.texture_SRV);
+
+		// + bind other textures here, e.g. a normal map, to appropriate slots
+		//bind sampler
+		dxdevice_context->PSSetSamplers(0, 1, &SamplerState);
+
+		// Make the drawcall
+		dxdevice_context->DrawIndexed(irange.size, irange.start, 0);
+	}
+	dxdevice_context->DrawIndexed(nbr_indices, 0, 0); //?
+}
+
+Cube::~Cube()
+{
+	for (auto& material : materials)
+	{
+		SAFE_RELEASE(material.diffuse_texture.texture_SRV);
+
+		// Release other used textures ...
+	}
+	SAFE_RELEASE(SamplerState);
 }
 #pragma endregion
 
-
+#pragma region QuadFace
 
 QuadModel::QuadModel(
 	ID3D11Device* dxdevice,
@@ -400,6 +421,8 @@ void QuadModel::Render() const
 	// Make the drawcall
 	dxdevice_context->DrawIndexed(nbr_indices, 0, 0);
 }
+
+#pragma endregion
 
 
 OBJModel::OBJModel(
@@ -508,6 +531,7 @@ void OBJModel::Render() const
 
 		// Bind diffuse texture to slot t0 of the PS
 		dxdevice_context->PSSetShaderResources(0, 1, &mtl.diffuse_texture.texture_SRV);
+
 		// + bind other textures here, e.g. a normal map, to appropriate slots
 
 		// Make the drawcall

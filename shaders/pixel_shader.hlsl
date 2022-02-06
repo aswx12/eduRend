@@ -1,5 +1,8 @@
 
 Texture2D texDiffuse : register(t0);
+Texture2D texNormal : register(t1);
+
+SamplerState texSampler : register(s0);
 
 cbuffer LightCamBuffer : register(b0)
 {
@@ -37,11 +40,12 @@ float4 PS_main(PSIn input) : SV_Target
 	float3 L = normalize(lightPos.xyz - input.PosWorld); //light vector
 	float3 V = normalize(cameraPos.xyz - input.PosWorld); //view vector
 
+	float4 diffColor = texDiffuse.Sample(texSampler, input.TexCoord);
+
 	float3 R = normalize(reflect(-L, N)); //L reflect in N
-	/*float3 nR = normalize(*/
 	float a = 200;
 
-	float4 Id = max(Kd * dot(L, N),0);
+	float4 Id = max(diffColor * dot(L, N),0);
 	float4 SpecDot = max(dot(R, V),0);
 	float4 SpecPow = pow(SpecDot, a);
 	float4 Is = Ks * SpecPow;

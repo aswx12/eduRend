@@ -53,19 +53,17 @@ void OurTestScene::Init()
 
 	// Create objects
 	quad = new QuadModel(dxdevice, dxdevice_context);
-	cube = new Cube("assets/sphere/sphere.mtl", dxdevice, dxdevice_context);
-	cube2 = new Cube("assets/WoodenCrate/WoodenCrate.mtl", dxdevice, dxdevice_context);
-	cube3 = new Cube("assets/WoodenCrate/WoodenCrate.mtl", dxdevice, dxdevice_context);
+	cube = new Cube("assets/trojan/trojan.obj",dxdevice, dxdevice_context);
+	/*cube2 = new Cube("assets/WoodenCrate/WoodenCrate.mtl", dxdevice, dxdevice_context);
+	cube3 = new Cube("assets/WoodenCrate/WoodenCrate.mtl", dxdevice, dxdevice_context);*/
 
 	sponza = new OBJModel("assets/crytek-sponza/sponza.obj", dxdevice, dxdevice_context);
 	sphere = new OBJModel("assets/sphere/sphere.obj", dxdevice, dxdevice_context);
-	sphere->Ka = { 1, 0.5, 0 };
-	sphere->Kd = { 0, 1, 0 };
-	sphere->Ks = { 1, 0, 0 };
 
-	sponza->Ka = { 0, 0.5, 0 };
-	sponza->Kd = { 0, 0.5, 0 };
-	sponza->Ks = { 1, 1, 1 };
+
+	//sponza->Ka = { 0, 0.5, 0 };
+	//sponza->Kd = { 0, 0.5, 0 };
+	//sponza->Ks = { 1, 1, 1 };
 }
 
 //
@@ -119,8 +117,8 @@ void OurTestScene::Update(float dt, InputHandler* input_handler)
 	{
 		camera->rotateAroundY(camera_vel * mousedx * dt * 0.3f);
 		camera->rotateAroundX(camera_vel * mousedy * dt * 0.3f);
-		/*light->rotateAroundY(camera_vel * mousedx * dt * 0.3f);
-		light->rotateAroundX(camera_vel * mousedy * dt * 0.3f);*/
+		light->rotateAroundY(camera_vel * mousedx * dt * 0.3f);
+		light->rotateAroundX(camera_vel * mousedy * dt * 0.3f);
 	}
 #pragma endregion
 
@@ -153,7 +151,7 @@ void OurTestScene::Update(float dt, InputHandler* input_handler)
 	//	light->rotateAroundY(camera_vel * mousedx * dt * 0.3f);
 	//	light->rotateAroundX(camera_vel * mousedy * dt * 0.3f);
 	//}
-//#pragma endregion
+#pragma endregion
 
 
 	// Now set/update object transformations
@@ -163,7 +161,7 @@ void OurTestScene::Update(float dt, InputHandler* input_handler)
 	// via e.g. Mquad = linalg::mat4f_identity; 
 
 	// Quad model-to-world transformation
-	Mquad = mat4f::translation(0, 0, 0) *			// No translation
+	Mquad = mat4f::translation(0, 5, 0) *			// No translation
 		mat4f::rotation(-angle, 0.0f, 1.0f, 0.0f) *	// Rotate continuously around the y-axis
 		mat4f::scaling(1.5, 1.5, 1.5);				// Scale uniformly to 150%
 
@@ -229,26 +227,24 @@ void OurTestScene::Render()
 	// Load matrices + the Quad's transformation to the device and render it
 	//UpdateTransformationBuffer(Mquad, Mview, Mproj);
 	//quad->Render();
-	//UpdateTransformationBuffer(Mcube, Mview, Mproj);
-
-	//
-	//cube->Render();
+	UpdateTransformationBuffer(Mcube, Mview, Mproj);	
+	cube->Render();
 
 	//UpdateTransformationBuffer(Mcube2, Mview, Mproj);
 	//cube2->Render();
 
 	//UpdateTransformationBuffer(Mcube3, Mview, Mproj);
 	//cube3->Render();
-	vec4f Ka = { sphere->Ka,0 };
-	vec4f Kd = { sphere->Kd,0 };
-	vec4f Ks = { sphere->Ks,0 };
-	UpdateMaterialBuffer(Ka, Kd, Ks);
-	UpdateTransformationBuffer(Msphere, Mview, Mproj);
-	sphere->Render();
-	vec4f Ka2 = { sponza->Ka,0 };
-	vec4f Kd2 = { sponza->Kd,0 };
-	vec4f Ks2 = { sponza->Ks,0 };
-	UpdateMaterialBuffer(Ka2, Kd2, Ks2);
+	//vec4f Ka = { sphere->Ka,0 };
+	//vec4f Kd = { sphere->Kd,0 };
+	//vec4f Ks = { sphere->Ks,0 };
+	//UpdateMaterialBuffer(Ka, Kd, Ks);
+	//UpdateTransformationBuffer(Msphere, Mview, Mproj);
+	//sphere->Render();
+	//vec4f Ka2 = { sponza->Ka,0 };
+	//vec4f Kd2 = { sponza->Kd,0 };
+	//vec4f Ks2 = { sponza->Ks,0 };
+	//UpdateMaterialBuffer(Ka2, Kd2, Ks2);
 	// Load matrices + Sponza's transformation to the device and render it
 	UpdateTransformationBuffer(Msponza, Mview, Mproj);
 	sponza->Render();

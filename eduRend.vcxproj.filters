@@ -70,7 +70,7 @@
     <ClInclude Include="src\shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LightPoint.h">
+    <ClInclude Include="src\LightPoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
